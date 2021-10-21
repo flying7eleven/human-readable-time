@@ -21,6 +21,23 @@ impl HumanReadableDuration {
     pub fn seconds(&self) -> u64 {
         self.time_in_seconds
     }
+
+    /// Get the duration time in full minutes
+    ///
+    /// # Example
+    /// ```
+    /// use std::str::FromStr;
+    /// use human_readable_time::HumanReadableDuration;
+    ///
+    /// let duration = HumanReadableDuration::from_str("65s");
+    ///
+    /// assert_eq!(1, duration.unwrap().minutes());
+    /// ```
+    pub fn minutes(&self) -> u64 {
+        let divisor = self.time_in_seconds as f32;
+        let result = divisor / 60.0f32;
+        return result as u64;
+    }
 }
 
 /// The error which will be returned, if a value could not be parsed into an `HumanReadableDuration`
@@ -59,20 +76,23 @@ mod tests {
     fn from_str_10s_works() {
         let representation = HumanReadableDuration::from_str("10s");
         assert_eq!(true, representation.is_ok());
-        assert_eq!(10, representation.unwrap().seconds());
+        assert_eq!(10, representation.as_ref().unwrap().seconds());
+        assert_eq!(0, representation.as_ref().unwrap().minutes());
     }
 
     #[test]
     fn from_str_60s_works() {
         let representation = HumanReadableDuration::from_str("60");
         assert_eq!(true, representation.is_ok());
-        assert_eq!(60, representation.unwrap().seconds());
+        assert_eq!(60, representation.as_ref().unwrap().seconds());
+        assert_eq!(1, representation.as_ref().unwrap().minutes());
     }
 
     #[test]
     fn from_str_61s_works() {
         let representation = HumanReadableDuration::from_str("61s");
         assert_eq!(true, representation.is_ok());
-        assert_eq!(61, representation.unwrap().seconds());
+        assert_eq!(61, representation.as_ref().unwrap().seconds());
+        assert_eq!(1, representation.as_ref().unwrap().minutes());
     }
 }
