@@ -1,0 +1,20 @@
+[package]
+name = "human-readable-time"
+version = "0.0.1"
+authors = ["Tim Janke <tim+github@janke.biz>"]
+edition = "2018"
+description = "A data structure for managing a human readable time"
+documentation = "https://docs.rs/human-readable-time"
+license = "MIT"
+readme = "README.md"
+repository = "https://github.com/flying7eleven/human-readable-time"
+keywords = ["time", "duration", "datatype", "type"]
+categories = ["value-formatting", "rust-patterns", "data-structures"]
+exclude = [".github/", ".gitignore"]
+
+[features]
+default = ["std"]
+std = []
+
+[badges]
+maintenance = { status = "actively-developed" }
