@@ -12,9 +12,5 @@ keywords = ["time", "duration", "datatype", "type"]
 categories = ["value-formatting", "rust-patterns", "data-structures"]
 exclude = [".github/", ".gitignore"]
 
-[features]
-default = ["std"]
-std = []
-
 [badges]
 maintenance = { status = "actively-developed" }
