@@ -147,6 +147,50 @@ impl From<u32> for HumanReadableDuration {
     }
 }
 
+/// Used to do value-to-value conversions while consuming the input value. It is the reciprocal of
+/// [`Into`].
+impl From<u16> for HumanReadableDuration {
+    /// Create an instance for [`HumanReadableDuration`] from a `u16` field representing the seconds
+    ///
+    /// # Example
+    /// ```
+    /// use human_readable_time::HumanReadableDuration;
+    ///
+    /// let seconds: u16 = 300;
+    /// let representation = HumanReadableDuration::from(seconds);
+    ///
+    /// assert_eq!(300, representation.seconds());
+    /// assert_eq!(5, representation.minutes());
+    /// ```
+    fn from(value: u16) -> Self {
+        HumanReadableDuration {
+            time_in_seconds: value as u64,
+        }
+    }
+}
+
+/// Used to do value-to-value conversions while consuming the input value. It is the reciprocal of
+/// [`Into`].
+impl From<u8> for HumanReadableDuration {
+    /// Create an instance for [`HumanReadableDuration`] from a `u8` field representing the seconds
+    ///
+    /// # Example
+    /// ```
+    /// use human_readable_time::HumanReadableDuration;
+    ///
+    /// let seconds: u8 = 120;
+    /// let representation = HumanReadableDuration::from(seconds);
+    ///
+    /// assert_eq!(120, representation.seconds());
+    /// assert_eq!(2, representation.minutes());
+    /// ```
+    fn from(value: u8) -> Self {
+        HumanReadableDuration {
+            time_in_seconds: value as u64,
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use crate::HumanReadableDuration;
