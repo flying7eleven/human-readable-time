@@ -90,9 +90,16 @@ impl FromStr for HumanReadableDuration {
     /// assert_eq!(50, x.seconds());
     /// ```
     fn from_str(value: &str) -> Result<Self, Self::Err> {
-        Ok(HumanReadableDuration {
-            time_in_seconds: value.split("s").next().unwrap().parse::<u64>().unwrap(),
-        })
+        if value.contains('s') {
+            let actual_time_value = value.split("s").next().unwrap().trim();
+            let maybe_parsed_time_value = actual_time_value.parse::<u64>();
+            if maybe_parsed_time_value.is_ok() {
+                return Ok(HumanReadableDuration {
+                    time_in_seconds: maybe_parsed_time_value.unwrap(),
+                });
+            }
+        }
+        Err(ParseHumanReadableDurationError)
     }
 }
 
@@ -160,6 +167,14 @@ mod tests {
     }
 
     #[test]
+    fn from_str_10_s_works() {
+        let representation = HumanReadableDuration::from_str("10 s");
+        assert_eq!(true, representation.is_ok());
+        assert_eq!(10, representation.as_ref().unwrap().seconds());
+        assert_eq!(0, representation.as_ref().unwrap().minutes());
+    }
+
+    #[test]
     fn from_str_10s_works() {
         let representation = HumanReadableDuration::from_str("10s");
         assert_eq!(true, representation.is_ok());
@@ -169,7 +184,7 @@ mod tests {
 
     #[test]
     fn from_str_60s_works() {
-        let representation = HumanReadableDuration::from_str("60");
+        let representation = HumanReadableDuration::from_str("60s");
         assert_eq!(true, representation.is_ok());
         assert_eq!(60, representation.as_ref().unwrap().seconds());
         assert_eq!(1, representation.as_ref().unwrap().minutes());
