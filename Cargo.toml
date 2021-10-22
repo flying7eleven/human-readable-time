@@ -2,7 +2,7 @@
 name = "human-readable-time"
 version = "0.1.2"
 authors = ["Tim Janke <tim+github@janke.biz>"]
-edition = "2018"
+edition = "2021"
 description = "A data structure for managing a human readable time"
 documentation = "https://docs.rs/human-readable-time"
 license = "MIT"

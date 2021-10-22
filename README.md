@@ -20,6 +20,8 @@
 
 3. Use it 😉
 
-## License
+## Minimum Supported Rust Version (MSRV)
+The MSRV for this tool ist `1.56.0` since it uses rust 2021 edition features.
 
+## License
 This project is licensed under the MIT License.
