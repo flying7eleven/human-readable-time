@@ -5,4 +5,21 @@
 [![API docs](https://img.shields.io/badge/API-documentation-blue.svg)](https://docs.rs/human-readable-time)
 [![crates.io](https://img.shields.io/crates/v/human-readable-time.svg)](https://crates.io/crates/human-readable-time)
 
-TODO
+## Getting Started
+
+> Examples are available for several use-cases, check out the [examples folder](https://github.com/flying7eleven/human-readable-time/tree/main/examples).
+
+1. Create a new Rust project: `cargo new example`
+2. Add dependencies to this create to your **Cargo.toml** file:
+
+    ```toml
+    [dependencies.human-readable-time]
+    version = "0.1.2"
+    default-features = false
+    ```
+
+3. Use it 😉
+
+## License
+
+This project is licensed under the MIT License.
