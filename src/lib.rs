@@ -90,6 +90,15 @@ impl FromStr for HumanReadableDuration {
     /// assert_eq!(50, x.seconds());
     /// ```
     fn from_str(value: &str) -> Result<Self, Self::Err> {
+        if value.contains('m') {
+            let actual_time_value = value.split("m").next().unwrap().trim();
+            let maybe_parsed_time_value = actual_time_value.parse::<u64>();
+            if maybe_parsed_time_value.is_ok() {
+                return Ok(HumanReadableDuration {
+                    time_in_seconds: maybe_parsed_time_value.unwrap() * 60,
+                });
+            }
+        }
         if value.contains('s') {
             let actual_time_value = value.split("s").next().unwrap().trim();
             let maybe_parsed_time_value = actual_time_value.parse::<u64>();
@@ -240,5 +249,37 @@ mod tests {
         assert_eq!(true, representation.is_ok());
         assert_eq!(61, representation.as_ref().unwrap().seconds());
         assert_eq!(1, representation.as_ref().unwrap().minutes());
+    }
+
+    #[test]
+    fn from_str_5_m_works() {
+        let representation = HumanReadableDuration::from_str("5 m");
+        assert_eq!(true, representation.is_ok());
+        assert_eq!(300, representation.as_ref().unwrap().seconds());
+        assert_eq!(5, representation.as_ref().unwrap().minutes());
+    }
+
+    #[test]
+    fn from_str_5m_works() {
+        let representation = HumanReadableDuration::from_str("5m");
+        assert_eq!(true, representation.is_ok());
+        assert_eq!(300, representation.as_ref().unwrap().seconds());
+        assert_eq!(5, representation.as_ref().unwrap().minutes());
+    }
+
+    #[test]
+    fn from_str_60m_works() {
+        let representation = HumanReadableDuration::from_str("60m");
+        assert_eq!(true, representation.is_ok());
+        assert_eq!(3600, representation.as_ref().unwrap().seconds());
+        assert_eq!(60, representation.as_ref().unwrap().minutes());
+    }
+
+    #[test]
+    fn from_str_61m_works() {
+        let representation = HumanReadableDuration::from_str("61m");
+        assert_eq!(true, representation.is_ok());
+        assert_eq!(3660, representation.as_ref().unwrap().seconds());
+        assert_eq!(61, representation.as_ref().unwrap().minutes());
     }
 }
