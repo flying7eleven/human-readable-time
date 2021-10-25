@@ -282,4 +282,44 @@ mod tests {
         assert_eq!(3660, representation.as_ref().unwrap().seconds());
         assert_eq!(61, representation.as_ref().unwrap().minutes());
     }
+
+    #[test]
+    fn from_str_4_m_10_s_works() {
+        let representation = HumanReadableDuration::from_str("4 m 10 s");
+        assert_eq!(true, representation.is_ok());
+        assert_eq!(250, representation.as_ref().unwrap().seconds());
+        assert_eq!(4, representation.as_ref().unwrap().minutes());
+    }
+
+    #[test]
+    fn from_str_4m_10s_works() {
+        let representation = HumanReadableDuration::from_str("4m 10s");
+        assert_eq!(true, representation.is_ok());
+        assert_eq!(250, representation.as_ref().unwrap().seconds());
+        assert_eq!(4, representation.as_ref().unwrap().minutes());
+    }
+
+    #[test]
+    fn from_str_4m10s_works() {
+        let representation = HumanReadableDuration::from_str("4m10s");
+        assert_eq!(true, representation.is_ok());
+        assert_eq!(250, representation.as_ref().unwrap().seconds());
+        assert_eq!(4, representation.as_ref().unwrap().minutes());
+    }
+
+    #[test]
+    fn from_str_3m60s_works() {
+        let representation = HumanReadableDuration::from_str("3m60s");
+        assert_eq!(true, representation.is_ok());
+        assert_eq!(240, representation.as_ref().unwrap().seconds());
+        assert_eq!(4, representation.as_ref().unwrap().minutes());
+    }
+
+    #[test]
+    fn from_str_3m61s_works() {
+        let representation = HumanReadableDuration::from_str("3m61s");
+        assert_eq!(true, representation.is_ok());
+        assert_eq!(241, representation.as_ref().unwrap().seconds());
+        assert_eq!(4, representation.as_ref().unwrap().minutes());
+    }
 }
