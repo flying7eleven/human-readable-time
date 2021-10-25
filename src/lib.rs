@@ -66,6 +66,21 @@ impl Display for ParseHumanReadableDurationError {
 
 impl std::error::Error for ParseHumanReadableDurationError {}
 
+/// The internally used time units which are supported.
+enum InternalTimeUnit {
+    Seconds,
+    Minutes,
+}
+
+/// A tuple of a time unit and the corresponding value (only for internal use).
+struct InternalTime(u64, InternalTimeUnit);
+
+/// A method for extracting the containing time information from a string. This method should
+/// only be used internally.
+fn extract_time_information(_: &str) -> Vec<InternalTime> {
+    vec![]
+}
+
 /// Parse a value from a string
 ///
 /// `FromStr`'s `from_str` method is often used implicitly, through
@@ -90,25 +105,25 @@ impl FromStr for HumanReadableDuration {
     /// assert_eq!(50, x.seconds());
     /// ```
     fn from_str(value: &str) -> Result<Self, Self::Err> {
-        if value.contains('m') {
-            let actual_time_value = value.split("m").next().unwrap().trim();
-            let maybe_parsed_time_value = actual_time_value.parse::<u64>();
-            if maybe_parsed_time_value.is_ok() {
-                return Ok(HumanReadableDuration {
-                    time_in_seconds: maybe_parsed_time_value.unwrap() * 60,
-                });
+        // try to get the time information from the passed string
+        let time_information = extract_time_information(value);
+
+        // if we could not extract any information, return an error
+        if time_information.is_empty() {
+            return Err(ParseHumanReadableDurationError);
+        }
+
+        // sum up the seconds and return corresponding object
+        let mut seconds = 0;
+        for current_time_object in time_information {
+            match current_time_object.1 {
+                InternalTimeUnit::Seconds => seconds += current_time_object.0,
+                InternalTimeUnit::Minutes => seconds += current_time_object.0 * 60,
             }
         }
-        if value.contains('s') {
-            let actual_time_value = value.split("s").next().unwrap().trim();
-            let maybe_parsed_time_value = actual_time_value.parse::<u64>();
-            if maybe_parsed_time_value.is_ok() {
-                return Ok(HumanReadableDuration {
-                    time_in_seconds: maybe_parsed_time_value.unwrap(),
-                });
-            }
-        }
-        Err(ParseHumanReadableDurationError)
+        return Ok(HumanReadableDuration {
+            time_in_seconds: seconds,
+        });
     }
 }
 
