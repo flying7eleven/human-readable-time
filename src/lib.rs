@@ -95,8 +95,27 @@ struct InternalTime(u64, InternalTimeUnit);
 
 /// A method for extracting the containing time information from a string. This method should
 /// only be used internally.
-fn extract_time_information(_: &str) -> Vec<InternalTime> {
-    vec![]
+fn extract_time_information(value: &str) -> Vec<InternalTime> {
+    use lazy_static::lazy_static;
+    use regex::Regex;
+
+    // compile the regular expression for extracting the supported timings
+    lazy_static! {
+        static ref TIME_REGEX: Regex = Regex::from_str(r"([0-9]+).*([ms]){1}").unwrap();
+    }
+
+    // collect all found matches
+    let mut found_matches = vec![];
+    for capture in TIME_REGEX.captures_iter(value) {
+        if let Ok(time) = u64::from_str(&capture[1]) {
+            if let Ok(unit) = InternalTimeUnit::from_str(&capture[2]) {
+                found_matches.push(InternalTime(time, unit))
+            }
+        }
+    }
+
+    // return the found matches
+    found_matches
 }
 
 /// Parse a value from a string
