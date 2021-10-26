@@ -72,6 +72,24 @@ enum InternalTimeUnit {
     Minutes,
 }
 
+impl FromStr for InternalTimeUnit {
+    type Err = ();
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        // ensure that the string has to be at least one character long
+        if s.len() < 1 {
+            return Err(());
+        }
+
+        // match the first character to the corresponding unit
+        match s.to_lowercase().chars().next().unwrap() {
+            's' => Ok(InternalTimeUnit::Seconds),
+            'm' => Ok(InternalTimeUnit::Minutes),
+            _ => Err(()),
+        }
+    }
+}
+
 /// A tuple of a time unit and the corresponding value (only for internal use).
 struct InternalTime(u64, InternalTimeUnit);
 
