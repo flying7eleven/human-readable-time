@@ -101,7 +101,7 @@ fn extract_time_information(value: &str) -> Vec<InternalTime> {
 
     // compile the regular expression for extracting the supported timings
     lazy_static! {
-        static ref TIME_REGEX: Regex = Regex::from_str(r"([0-9]+).*([ms]){1}").unwrap();
+        static ref TIME_REGEX: Regex = Regex::from_str(r"([0-9]+)([ms]){1}").unwrap();
     }
 
     // collect all found matches
@@ -272,11 +272,9 @@ mod tests {
     }
 
     #[test]
-    fn from_str_10_s_works() {
+    fn from_str_10_s_will_be_handled_gracefully() {
         let representation = HumanReadableDuration::from_str("10 s");
-        assert_eq!(true, representation.is_ok());
-        assert_eq!(10, representation.as_ref().unwrap().seconds());
-        assert_eq!(0, representation.as_ref().unwrap().minutes());
+        assert_eq!(true, representation.is_err());
     }
 
     #[test]
@@ -304,11 +302,9 @@ mod tests {
     }
 
     #[test]
-    fn from_str_5_m_works() {
+    fn from_str_5_m_will_be_handled_gracefully() {
         let representation = HumanReadableDuration::from_str("5 m");
-        assert_eq!(true, representation.is_ok());
-        assert_eq!(300, representation.as_ref().unwrap().seconds());
-        assert_eq!(5, representation.as_ref().unwrap().minutes());
+        assert_eq!(true, representation.is_err());
     }
 
     #[test]
@@ -336,11 +332,9 @@ mod tests {
     }
 
     #[test]
-    fn from_str_4_m_10_s_works() {
+    fn from_str_4_m_10_s_will_be_handled_gracefully() {
         let representation = HumanReadableDuration::from_str("4 m 10 s");
-        assert_eq!(true, representation.is_ok());
-        assert_eq!(250, representation.as_ref().unwrap().seconds());
-        assert_eq!(4, representation.as_ref().unwrap().minutes());
+        assert_eq!(true, representation.is_err());
     }
 
     #[test]
