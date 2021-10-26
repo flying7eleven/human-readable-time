@@ -15,6 +15,10 @@ exclude = [".github/", ".gitignore"]
 [badges]
 maintenance = { status = "actively-developed" }
 
+[dependencies.lazy_static]
+version = "1.4.0"
+default-features = false
+
 [dependencies.regex]
 version = "1.5.4"
 default-features = false
