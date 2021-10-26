@@ -1,4 +1,4 @@
-use crate::traits::{AsMinutes, AsSeconds};
+use crate::traits::{AsHours, AsMinutes, AsSeconds};
 use std::fmt::{Debug, Display, Formatter};
 use std::str::FromStr;
 
@@ -48,6 +48,26 @@ impl AsMinutes for HumanReadableDuration {
     }
 }
 
+impl AsHours for HumanReadableDuration {
+    /// Get the duration time in full hours
+    ///
+    /// # Example
+    /// ```
+    /// use std::str::FromStr;
+    /// use human_readable_time::HumanReadableDuration;
+    /// use human_readable_time::traits::AsHours;
+    ///
+    /// let duration = HumanReadableDuration::from_str("65m");
+    ///
+    /// assert_eq!(1, duration.unwrap().as_hours());
+    /// ```
+    fn as_hours(&self) -> u64 {
+        let divisor = self.time_in_seconds as f32;
+        let result = divisor / 3600.0f32;
+        return result as u64;
+    }
+}
+
 /// The error which will be returned, if a value could not be parsed into an `HumanReadableDuration`
 pub struct ParseHumanReadableDurationError;
 
@@ -78,6 +98,7 @@ impl std::error::Error for ParseHumanReadableDurationError {}
 enum InternalTimeUnit {
     Seconds,
     Minutes,
+    Hours,
 }
 
 impl FromStr for InternalTimeUnit {
@@ -93,6 +114,7 @@ impl FromStr for InternalTimeUnit {
         match s.to_lowercase().chars().next().unwrap() {
             's' => Ok(InternalTimeUnit::Seconds),
             'm' => Ok(InternalTimeUnit::Minutes),
+            'h' => Ok(InternalTimeUnit::Hours),
             _ => Err(()),
         }
     }
@@ -109,7 +131,7 @@ fn extract_time_information(value: &str) -> Vec<InternalTime> {
 
     // compile the regular expression for extracting the supported timings
     lazy_static! {
-        static ref TIME_REGEX: Regex = Regex::from_str(r"([0-9]+)([ms]){1}").unwrap();
+        static ref TIME_REGEX: Regex = Regex::from_str(r"([0-9]+)([hms]){1}").unwrap();
     }
 
     // collect all found matches
@@ -165,6 +187,7 @@ impl FromStr for HumanReadableDuration {
             match current_time_object.1 {
                 InternalTimeUnit::Seconds => seconds += current_time_object.0,
                 InternalTimeUnit::Minutes => seconds += current_time_object.0 * 60,
+                InternalTimeUnit::Hours => seconds += current_time_object.0 * 3600,
             }
         }
         return Ok(HumanReadableDuration {
@@ -267,7 +290,7 @@ impl From<u8> for HumanReadableDuration {
 
 #[cfg(test)]
 mod tests {
-    use crate::traits::{AsMinutes, AsSeconds};
+    use crate::traits::{AsHours, AsMinutes, AsSeconds};
     use crate::HumanReadableDuration;
     use std::str::FromStr;
 
@@ -335,6 +358,7 @@ mod tests {
         assert_eq!(true, representation.is_ok());
         assert_eq!(3600, representation.as_ref().unwrap().as_seconds());
         assert_eq!(60, representation.as_ref().unwrap().as_minutes());
+        assert_eq!(1, representation.as_ref().unwrap().as_hours());
     }
 
     #[test]
@@ -343,6 +367,40 @@ mod tests {
         assert_eq!(true, representation.is_ok());
         assert_eq!(3660, representation.as_ref().unwrap().as_seconds());
         assert_eq!(61, representation.as_ref().unwrap().as_minutes());
+        assert_eq!(1, representation.as_ref().unwrap().as_hours());
+    }
+
+    #[test]
+    fn from_str_5_h_will_be_handled_gracefully() {
+        let representation = HumanReadableDuration::from_str("5 h");
+        assert_eq!(true, representation.is_err());
+    }
+
+    #[test]
+    fn from_str_5h_works() {
+        let representation = HumanReadableDuration::from_str("5h");
+        assert_eq!(true, representation.is_ok());
+        assert_eq!(18000, representation.as_ref().unwrap().as_seconds());
+        assert_eq!(300, representation.as_ref().unwrap().as_minutes());
+        assert_eq!(5, representation.as_ref().unwrap().as_hours());
+    }
+
+    #[test]
+    fn from_str_24h_works() {
+        let representation = HumanReadableDuration::from_str("24h");
+        assert_eq!(true, representation.is_ok());
+        assert_eq!(86400, representation.as_ref().unwrap().as_seconds());
+        assert_eq!(1440, representation.as_ref().unwrap().as_minutes());
+        assert_eq!(24, representation.as_ref().unwrap().as_hours());
+    }
+
+    #[test]
+    fn from_str_25h_works() {
+        let representation = HumanReadableDuration::from_str("25h");
+        assert_eq!(true, representation.is_ok());
+        assert_eq!(90000, representation.as_ref().unwrap().as_seconds());
+        assert_eq!(1500, representation.as_ref().unwrap().as_minutes());
+        assert_eq!(25, representation.as_ref().unwrap().as_hours());
     }
 
     #[test]
