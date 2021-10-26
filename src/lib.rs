@@ -284,6 +284,12 @@ mod tests {
     }
 
     #[test]
+    fn from_str_with_empty_string_will_be_handled_gracefully() {
+        let representation = HumanReadableDuration::from_str("");
+        assert_eq!(true, representation.is_err());
+    }
+
+    #[test]
     fn from_str_10_s_will_be_handled_gracefully() {
         let representation = HumanReadableDuration::from_str("10 s");
         assert_eq!(true, representation.is_err());
