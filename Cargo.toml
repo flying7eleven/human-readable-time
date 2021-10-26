@@ -14,3 +14,8 @@ exclude = [".github/", ".gitignore"]
 
 [badges]
 maintenance = { status = "actively-developed" }
+
+[dependencies.regex]
+version = "1.5.4"
+default-features = false
+features = ["std"]
