@@ -1,4 +1,6 @@
 use crate::errors::ParseHumanReadableDurationError;
+#[cfg(feature = "chrono")]
+use crate::traits::AsDuration;
 use crate::traits::{AsHours, AsMinutes, AsSeconds};
 use std::str::FromStr;
 
@@ -66,6 +68,26 @@ impl AsHours for HumanReadableDuration {
         let divisor = self.time_in_seconds as f32;
         let result = divisor / 3600.0f32;
         return result as u64;
+    }
+}
+
+#[cfg(feature = "chrono")]
+impl AsDuration for HumanReadableDuration {
+    /// Convert the object to a [`chrono::Duration`]  representation.
+    ///
+    /// # Example
+    /// ```
+    /// use std::str::FromStr;
+    /// use human_readable_time::HumanReadableDuration;
+    /// use human_readable_time::traits::AsDuration;
+    ///
+    /// let duration = HumanReadableDuration::from_str("65m").unwrap();
+    ///
+    /// assert_eq!(3900, duration.as_duration().num_seconds());
+    /// assert_eq!(1, duration.as_duration().num_hours());
+    /// ```
+    fn as_duration(&self) -> chrono::Duration {
+        chrono::Duration::seconds(self.time_in_seconds as i64) // TODO: check if `time_in_seconds` will fit in a i64
     }
 }
 

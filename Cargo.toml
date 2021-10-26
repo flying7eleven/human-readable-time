@@ -16,8 +16,7 @@ exclude = [".github/", ".gitignore"]
 maintenance = { status = "actively-developed" }
 
 [features]
-default = []
-duration = ["chrono"]
+default = ["chrono"]
 
 [dependencies.lazy_static]
 version = "1.4.0"

@@ -15,3 +15,10 @@ pub trait AsHours {
     /// Get the duration time in full hours
     fn as_hours(&self) -> u64;
 }
+
+/// Used to convert an object to a [`chrono::Duration`]  representation.
+#[cfg(feature = "chrono")]
+pub trait AsDuration {
+    /// Convert the object to a [`chrono::Duration`]  representation.
+    fn as_duration(&self) -> chrono::Duration;
+}
