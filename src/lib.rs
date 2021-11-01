@@ -1,7 +1,7 @@
 use crate::errors::ParseHumanReadableDurationError;
 #[cfg(feature = "chrono")]
 use crate::traits::AsDuration;
-use crate::traits::{AsHours, AsMinutes, AsSeconds};
+use crate::traits::{AsDays, AsHours, AsMinutes, AsSeconds};
 use std::str::FromStr;
 
 // the modules we have in this crate
@@ -71,6 +71,26 @@ impl AsHours for HumanReadableDuration {
     }
 }
 
+impl AsDays for HumanReadableDuration {
+    /// Get the duration time in full days
+    ///
+    /// # Example
+    /// ```
+    /// use std::str::FromStr;
+    /// use human_readable_time::HumanReadableDuration;
+    /// use human_readable_time::traits::AsDays;
+    ///
+    /// let duration = HumanReadableDuration::from_str("48h");
+    ///
+    /// assert_eq!(2, duration.unwrap().as_days());
+    /// ```
+    fn as_days(&self) -> u64 {
+        let divisor = self.time_in_seconds as f32;
+        let result = divisor / 86400.0f32;
+        return result as u64;
+    }
+}
+
 #[cfg(feature = "chrono")]
 impl AsDuration for HumanReadableDuration {
     /// Convert the object to a [`chrono::Duration`]  representation.
@@ -96,6 +116,7 @@ enum InternalTimeUnit {
     Seconds,
     Minutes,
     Hours,
+    Days,
 }
 
 impl FromStr for InternalTimeUnit {
@@ -112,6 +133,7 @@ impl FromStr for InternalTimeUnit {
             's' => Ok(InternalTimeUnit::Seconds),
             'm' => Ok(InternalTimeUnit::Minutes),
             'h' => Ok(InternalTimeUnit::Hours),
+            'd' => Ok(InternalTimeUnit::Days),
             _ => Err(()),
         }
     }
@@ -128,7 +150,7 @@ fn extract_time_information(value: &str) -> Vec<InternalTime> {
 
     // compile the regular expression for extracting the supported timings
     lazy_static! {
-        static ref TIME_REGEX: Regex = Regex::from_str(r"([0-9]+)([hms]){1}").unwrap();
+        static ref TIME_REGEX: Regex = Regex::from_str(r"([0-9]+)([dhms]){1}").unwrap();
     }
 
     // collect all found matches
@@ -185,6 +207,7 @@ impl FromStr for HumanReadableDuration {
                 InternalTimeUnit::Seconds => seconds += current_time_object.0,
                 InternalTimeUnit::Minutes => seconds += current_time_object.0 * 60,
                 InternalTimeUnit::Hours => seconds += current_time_object.0 * 3600,
+                InternalTimeUnit::Days => seconds += current_time_object.0 * 86400,
             }
         }
         return Ok(HumanReadableDuration {
@@ -287,7 +310,7 @@ impl From<u8> for HumanReadableDuration {
 
 #[cfg(test)]
 mod tests {
-    use crate::traits::{AsHours, AsMinutes, AsSeconds};
+    use crate::traits::{AsDays, AsHours, AsMinutes, AsSeconds};
     use crate::HumanReadableDuration;
     use std::str::FromStr;
 
@@ -404,6 +427,32 @@ mod tests {
         assert_eq!(90000, representation.as_ref().unwrap().as_seconds());
         assert_eq!(1500, representation.as_ref().unwrap().as_minutes());
         assert_eq!(25, representation.as_ref().unwrap().as_hours());
+    }
+
+    #[test]
+    fn from_str_5_d_will_be_handled_gracefully() {
+        let representation = HumanReadableDuration::from_str("5 d");
+        assert_eq!(true, representation.is_err());
+    }
+
+    #[test]
+    fn from_str_5d_works() {
+        let representation = HumanReadableDuration::from_str("5d");
+        assert_eq!(true, representation.is_ok());
+        assert_eq!(432000, representation.as_ref().unwrap().as_seconds());
+        assert_eq!(7200, representation.as_ref().unwrap().as_minutes());
+        assert_eq!(120, representation.as_ref().unwrap().as_hours());
+        assert_eq!(5, representation.as_ref().unwrap().as_days());
+    }
+
+    #[test]
+    fn from_str_32d_works() {
+        let representation = HumanReadableDuration::from_str("32d");
+        assert_eq!(true, representation.is_ok());
+        assert_eq!(2764800, representation.as_ref().unwrap().as_seconds());
+        assert_eq!(46080, representation.as_ref().unwrap().as_minutes());
+        assert_eq!(768, representation.as_ref().unwrap().as_hours());
+        assert_eq!(32, representation.as_ref().unwrap().as_days());
     }
 
     #[test]

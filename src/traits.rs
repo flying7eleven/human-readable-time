@@ -16,6 +16,12 @@ pub trait AsHours {
     fn as_hours(&self) -> u64;
 }
 
+/// Used to get the number of full days which represent a specific object which implements this trait.
+pub trait AsDays {
+    /// Get the duration time in full hours
+    fn as_days(&self) -> u64;
+}
+
 /// Used to convert an object to a [`chrono::Duration`]  representation.
 #[cfg(feature = "chrono")]
 pub trait AsDuration {
